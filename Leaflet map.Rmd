@@ -1,0 +1,53 @@
+---
+title: "Leaflet Map Example"
+author: "Tom van Dienst"
+date: "November 23, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE, message= FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+Sys.setlocale("LC_ALL","English")
+
+```
+
+Making just a map is no fun, let's add some data to it. For this piece we'll add all the world cities. 
+First let's download our file and read it in.
+
+```{r message=FALSE}
+download.file("http://www.opengeocode.org/download/worldcities.zip", "worldcities.zip")
+unzip("worldcities.zip")
+cities <- read.csv("worldcities.csv", stringsAsFactors = FALSE)
+#Only take with latin or english language script
+cities <- cities[cities$language.script %in% c("english", "en", "latin"),]
+set.seed(12345) #I've got the same combination on my luggage! :)
+
+cities <- cities[sample(nrow(cities), 150),]
+
+#latitude and longitude as numbers
+cities$latitude  <- as.numeric(cities$latitude)
+cities$longitude  <- as.numeric(cities$longitude)
+
+
+```
+
+And now let's show our map!
+```{r}
+library(leaflet)
+
+locs <- data.frame(lat = cities$latitude, lon = cities$longitude)
+popups <- cities$name
+
+
+locs %>% leaflet() %>% addTiles() %>% addMarkers(popup = popups, clusterOptions = markerClusterOptions())
+
+```
+
+
+There you go, a full map with a random 150 cities shown. 
+
+Just to repeat what's written up there, this document was written at 
+
+##23 november 2016
+
+In case you missed it at the beginning :)
